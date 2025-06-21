@@ -1,0 +1,206 @@
+{% extends "layout.html" %}
+
+{% block title %}لوحة التحكم - بوابة الطلاب{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h1 class="mb-4">لوحة التحكم</h1>
+        
+        <!-- إحصائيات الطالب -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="card stats-card">
+                    <div class="stats-icon">
+                        <i class="bi bi-book"></i>
+                    </div>
+                    <div class="stats-value">{{ stats.total_courses }}</div>
+                    <div class="stats-label">إجمالي الدورات</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card stats-card">
+                    <div class="stats-icon">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
+                    <div class="stats-value">{{ stats.completed_courses }}</div>
+                    <div class="stats-label">الدورات المكتملة</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card stats-card">
+                    <div class="stats-icon">
+                        <i class="bi bi-graph-up"></i>
+                    </div>
+                    <div class="stats-value">{{ stats.avg_progress|round }}%</div>
+                    <div class="stats-label">متوسط التقدم</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card stats-card">
+                    <div class="stats-icon">
+                        <i class="bi bi-calendar-check"></i>
+                    </div>
+                    <div class="stats-value">{{ stats.join_date }}</div>
+                    <div class="stats-label">تاريخ الانضمام</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- الرسوم البيانية -->
+        <div class="row mb-4">
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="mb-0">تقدم الدورات</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="progressChart" data-progress='{
+                                "completed": {{ stats.completed_courses }},
+                                "in_progress": {{ stats.total_courses - stats.completed_courses }},
+                                "not_started": 0
+                            }'></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="mb-0">نشاط التعلم</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="activityChart" data-activity='{
+                                "labels": ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو"],
+                                "values": [5, 10, 15, 8, 12, 20]
+                            }'></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- معلومات الطالب -->
+        <div class="card shadow mb-4">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0">معلومات الطالب</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-2 text-center">
+                        <img src="{{ url_for('static', filename='uploads/' + student.profile_picture) }}" alt="{{ student.name }}" class="img-fluid rounded-circle mb-3" style="width: 100px; height: 100px; object-fit: cover;">
+                    </div>
+                    <div class="col-md-5">
+                        <p><strong>الاسم:</strong> {{ student.name }}</p>
+                        <p><strong>البريد الإلكتروني:</strong> {{ student.email }}</p>
+                    </div>
+                    <div class="col-md-5 text-md-end">
+                        <p><strong>رقم الطالب:</strong> {{ student.id }}</p>
+                        <p><strong>آخر تسجيل دخول:</strong> {{ student.last_login.strftime('%Y-%m-%d %H:%M:%S') if student.last_login else 'غير متوفر' }}</p>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <p><strong>نبذة:</strong> {{ student.bio or 'لا توجد نبذة متاحة. قم بتحديث ملفك الشخصي لإضافة نبذة عنك.' }}</p>
+                    </div>
+                </div>
+                <div class="text-end">
+                    <a href="{{ url_for('profile') }}" class="btn btn-outline-primary">تعديل الملف الشخصي</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- الإشعارات غير المقروءة -->
+        {% if notifications %}
+        <div class="card shadow mb-4">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">الإشعارات الجديدة</h3>
+                <a href="{{ url_for('notifications') }}" class="btn btn-sm btn-light">عرض الكل</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    {% for notification in notifications %}
+                    <div class="list-group-item notification-item notification-unread">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1 notification-title">{{ notification.title }}</h5>
+                            <small class="notification-time">{{ notification.timestamp.strftime('%Y-%m-%d %H:%M') }}</small>
+                        </div>
+                        <p class="mb-1">{{ notification.message }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- الدورات المسجل فيها -->
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">الدورات المسجل فيها</h3>
+                <a href="{{ url_for('courses') }}" class="btn btn-sm btn-light">استعراض الدورات</a>
+            </div>
+            <div class="card-body">
+                {% if enrolled_courses %}
+                <div class="row">
+                    {% for course in enrolled_courses %}
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="row g-0">
+                                <div class="col-md-4">
+                                    <img src="{{ url_for('static', filename='uploads/' + course.image) }}" class="img-fluid rounded-start h-100" alt="{{ course.title }}" style="object-fit: cover;">
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ course.title }}</h5>
+                                        <p class="card-text small">{{ course.description|truncate(100) }}</p>
+                                        <div class="progress-card">
+                                            <div class="d-flex justify-content-between">
+                                                <span>التقدم</span>
+                                                <span>{{ course.progress }}%</span>
+                                            </div>
+                                            <div class="progress">
+                                                <div class="progress-bar bg-{{ 'success' if course.progress == 100 else 'primary' }}" 
+                                                     role="progressbar" 
+                                                     style="width: {{ course.progress }}%;" 
+                                                     aria-valuenow="{{ course.progress }}" 
+                                                     aria-valuemin="0" 
+                                                     aria-valuemax="100"
+                                                     data-course-id="{{ course.id }}">
+                                                    {{ course.progress }}%
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center mt-3">
+                                            <span class="badge course-status bg-{{ 'success' if course.completed else 'warning' }}" data-course-id="{{ course.id }}">
+                                                {{ 'مكتمل' if course.completed else 'قيد التقدم' }}
+                                            </span>
+                                            <a href="{{ url_for('course_details', course_id=course.id) }}" class="btn btn-sm btn-outline-primary">عرض التفاصيل</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    لم تقم بالتسجيل في أي دورة بعد. <a href="{{ url_for('courses') }}">استعرض الدورات المتاحة</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // تهيئة الرسوم البيانية عند تحميل الصفحة
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeCharts();
+    });
+</script>
+{% endblock %}

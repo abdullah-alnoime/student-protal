@@ -1,0 +1,194 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ course.title }} - تفاصيل الدورة{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h1 class="card-title mb-0">{{ course.title }}</h1>
+                </div>
+                <div class="card-body">
+                    <p><strong>الوصف:</strong> {{ course.description }}</p>
+                    <p><strong>المدرب:</strong> {{ course.instructor }}</p>
+                    <p><strong>المدة:</strong> {{ course.duration }}</p>
+                    <p><strong>المستوى:</strong> {{ course.level }}</p>
+
+                    {% if enrollment %}
+                    <p class="text-success">أنت مسجل حالياً في هذه الدورة.</p>
+                    <p>التقدم: {{ enrollment.progress }}%</p>
+                    {% if enrollment.completed %}
+                    <span class="badge bg-success">مكتمل</span>
+                    {% else %}
+                    <span class="badge bg-info">قيد التقدم</span>
+                    {% endif %}
+                    {% else %}
+                    <button class="btn btn-primary enroll-button-details" data-course-id="{{ course.id }}"
+                        data-course-title="{{ course.title }}">
+                        التسجيل في الدورة
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4>تقييمات الدورة</h4>
+                </div>
+                <div class="card-body">
+                    {% if ratings %}
+                    {% for rating in ratings %}
+                    <div class="mb-2">
+                        <strong>{{ rating.student.name }}:</strong> {{ rating.rating }}/5
+                        <p>{{ rating.review }}</p>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <p>لا توجد تقييمات لهذه الدورة حتى الآن.</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% if enrollment and not user_rating %}
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h4>قيم هذه الدورة</h4>
+                </div>
+                <div class="card-body">
+                    <form id="ratingFormDetails" data-course-id="{{ course.id }}">
+                        <div class="mb-3">
+                            <label for="ratingRange" class="form-label">التقييم (1-5):</label>
+                            <input type="range" class="form-range" min="1" max="5" id="ratingRange" name="rating"
+                                required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="reviewText" class="form-label">مراجعتك:</label>
+                            <textarea class="form-control" id="reviewText" name="review" rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-success">إرسال التقييم</button>
+                    </form>
+                </div>
+            </div>
+            {% elif user_rating %}
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h4>تقييمك</h4>
+                </div>
+                <div class="card-body">
+                    <p><strong>تقييمك:</strong> {{ user_rating.rating }}/5</p>
+                    <p>{{ user_rating.review }}</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal for enrollment confirmation -->
+<div class="modal fade" id="enrollmentModalDetails" tabindex="-1" aria-labelledby="enrollmentModalDetailsLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="enrollmentModalDetailsLabel">تأكيد التسجيل</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                هل أنت متأكد أنك تريد التسجيل في دورة <strong id="courseNameDetails"></strong>؟
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                <button type="button" class="btn btn-primary" id="confirmEnrollDetails">تأكيد</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    $(document).ready(function () {
+        // Handle enrollment from course details page
+        $('.enroll-button-details').click(function () {
+            const courseId = $(this).data('course-id');
+            const courseTitle = $(this).data('course-title');
+            $('#courseNameDetails').text(courseTitle);
+            $('#confirmEnrollDetails').data('course-id', courseId); // Store courseId on the confirm button
+            var enrollmentModal = new bootstrap.Modal(document.getElementById('enrollmentModalDetails'));
+            enrollmentModal.show();
+        });
+
+        $('#confirmEnrollDetails').click(function () {
+            const rawCourseId = $(this).data('course-id');
+            const courseId = parseInt(rawCourseId, 10);
+
+            if (isNaN(courseId)) {
+                console.error('Invalid course ID on details page:', rawCourseId);
+                var enrollmentModal = bootstrap.Modal.getInstance(document.getElementById('enrollmentModalDetails'));
+                enrollmentModal.hide();
+                // You might want to show an alert to the user here
+                alert('معرف الدورة غير صالح. لا يمكن إتمام عملية التسجيل.');
+                return;
+            }
+
+            $.ajax({
+                url: '/ajax/enroll',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ course_id: courseId }),
+                headers: { 'X-CSRFToken': '{{ csrf_token() }}' }, // Make sure CSRF token is available and correct
+                success: function (response) {
+                    var enrollmentModal = bootstrap.Modal.getInstance(document.getElementById('enrollmentModalDetails'));
+                    enrollmentModal.hide();
+                    alert(response.message); // Or use a more sophisticated notification
+                    if (response.success) {
+                        // Optionally, refresh part of the page or redirect
+                        location.reload();
+                    }
+                },
+                error: function (xhr) {
+                    var enrollmentModal = bootstrap.Modal.getInstance(document.getElementById('enrollmentModalDetails'));
+                    enrollmentModal.hide();
+                    let errorMessage = 'حدث خطأ أثناء التسجيل.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    }
+                    alert(errorMessage);
+                }
+            });
+        });
+
+        // Handle rating submission from course details page
+        $('#ratingFormDetails').submit(function (event) {
+            event.preventDefault();
+            const courseId = $(this).data('course-id');
+            const rating = $('#ratingRange').val();
+            const review = $('#reviewText').val();
+
+            $.ajax({
+                url: '/ajax/rate',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ course_id: parseInt(courseId), rating: parseInt(rating), review: review }),
+                headers: { 'X-CSRFToken': '{{ csrf_token() }}' }, // CSRF token
+                success: function (response) {
+                    alert(response.message);
+                    if (response.success) {
+                        location.reload();
+                    }
+                },
+                error: function (xhr) {
+                    let errorMessage = 'حدث خطأ أثناء إرسال التقييم.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    }
+                    alert(errorMessage);
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
