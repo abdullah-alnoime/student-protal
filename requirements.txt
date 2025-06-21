@@ -1,8 +1,8 @@
 Flask==2.2.3
-Flask-SQLAlchemy==3.0.3
+Flask-SQLAlchemy==3.1.1
+SQLAlchemy==1.4.49
 Werkzeug==2.2.3
-SQLAlchemy==2.0.23
-PyMySQL==1.1.0 # Changed from pymysql to PyMySQL for consistency with common usage
+PyMySQL==1.1.0
 cryptography==40.0.1
 Jinja2==3.1.2
 MarkupSafe==2.1.2
