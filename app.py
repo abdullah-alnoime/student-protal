@@ -18,7 +18,7 @@ app.register_blueprint(ajax_bp)
 app.config['SECRET_KEY'] = os.urandom(24)
 # TODO: Replace with your MySQL connection string
 # Example: app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://user:password@host/dbname'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/student_portal_db' # Placeholder, user MUST update this
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://uossi9vngk1oimlt:3h2StFWlMaDzpYFYV40O@biwhz4mugpsww65lpmd1-mysql.services.clever-cloud.com:3306/biwhz4mugpsww65lpmd1'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=1)
 app.config['SESSION_COOKIE_SECURE'] = True  # للإنتاج فقط، استخدم False للتطوير المحلي
