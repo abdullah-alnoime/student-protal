@@ -315,7 +315,7 @@ def create_tables():
             Course(
                 title='مقدمة في علوم الحاسوب', 
                 description='دورة تمهيدية تغطي أساسيات علوم الحاسوب والبرمجة',
-                image='https://images.app.goo.gl/n1Yeh'
+                image='https://images.app.goo.gl/n1Yeh',
                 instructor='د. أحمد محمد',
                 duration='8 أسابيع',
                 level='مبتدئ',
