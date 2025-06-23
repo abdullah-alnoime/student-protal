@@ -324,6 +324,7 @@ def create_tables():
             Course(
                 title='قواعد البيانات المتقدمة', 
                 description='دورة متقدمة في تصميم وإدارة قواعد البيانات',
+                image='https://images.app.goo.gl/i74SP',
                 instructor='د. سارة أحمد',
                 duration='10 أسابيع',
                 level='متقدم',
@@ -332,6 +333,7 @@ def create_tables():
             Course(
                 title='تطوير تطبيقات الويب', 
                 description='تعلم كيفية بناء تطبيقات ويب حديثة باستخدام Flask وDjango',
+                image='https://images.app.goo.gl/Ectia',
                 instructor='م. محمد علي',
                 duration='12 أسبوع',
                 level='متوسط',
@@ -340,6 +342,7 @@ def create_tables():
             Course(
                 title='الذكاء الاصطناعي', 
                 description='مقدمة في مفاهيم وتقنيات الذكاء الاصطناعي وتعلم الآلة',
+                image='https://images.app.goo.gl/SqLDg',
                 instructor='د. ليلى حسن',
                 duration='14 أسبوع',
                 level='متقدم',
@@ -348,6 +351,7 @@ def create_tables():
             Course(
                 title='أمن المعلومات', 
                 description='دورة شاملة في أساسيات أمن المعلومات وحماية البيانات',
+                image='https://images.app.goo.gl/kz5JA',
                 instructor='د. خالد عمر',
                 duration='8 أسابيع',
                 level='متوسط',
@@ -356,6 +360,7 @@ def create_tables():
             Course(
                 title='تطوير تطبيقات الهاتف المحمول', 
                 description='تعلم كيفية بناء تطبيقات للهواتف الذكية باستخدام React Native وFlutter',
+                image='https://images.app.goo.gl/hZbgA',
                 instructor='م. نورا سامي',
                 duration='10 أسابيع',
                 level='متوسط',
@@ -364,6 +369,7 @@ def create_tables():
             Course(
                 title='الشبكات وأنظمة التشغيل', 
                 description='دورة شاملة في أساسيات الشبكات وأنظمة التشغيل',
+                image='https://images.app.goo.gl/BN7Mg',
                 instructor='د. سمير فؤاد',
                 duration='12 أسبوع',
                 level='مبتدئ',
