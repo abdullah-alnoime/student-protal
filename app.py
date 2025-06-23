@@ -372,6 +372,7 @@ def create_tables():
             Course(
                 title='تحليل البيانات وعلم البيانات', 
                 description='تعلم كيفية تحليل البيانات واستخراج الرؤى منها باستخدام Python وR',
+                image='https://images.app.goo.gl/SNvkh',
                 instructor='د. هدى كمال',
                 duration='14 أسبوع',
                 level='متوسط',
