@@ -9,7 +9,7 @@ class Student(db.Model):
     name = db.Column(db.String(100))
     email = db.Column(db.String(100), unique=True)
     password_hash = db.Column(db.String(255))
-    profile_picture = db.Column(db.String(255), default='default-profile.jpg')
+    profile_picture = db.Column(db.String(255), default='https://ik.imagekit.io/wqgmjzjo5j/default-profile.jpg')
     bio = db.Column(db.Text, nullable=True)
     join_date = db.Column(db.DateTime, default=datetime.utcnow)
     last_login = db.Column(db.DateTime, nullable=True)
@@ -38,7 +38,7 @@ class Course(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100))
     description = db.Column(db.Text)
-    image = db.Column(db.String(255), default='default-course.jpg')
+    image = db.Column(db.String(255), default='https://ik.imagekit.io/wqgmjzjo5j/default-course.png')
     instructor = db.Column(db.String(100), nullable=True)
     duration = db.Column(db.String(50), nullable=True)  # e.g., "8 weeks"
     level = db.Column(db.String(20), nullable=True)  # e.g., "Beginner", "Intermediate", "Advanced"

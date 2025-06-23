@@ -315,7 +315,7 @@ def create_tables():
             Course(
                 title='مقدمة في علوم الحاسوب', 
                 description='دورة تمهيدية تغطي أساسيات علوم الحاسوب والبرمجة',
-                image='https://images.app.goo.gl/n1Yeh',
+                image='https://ik.imagekit.io/wqgmjzjo5j/ICS.jpg',
                 instructor='د. أحمد محمد',
                 duration='8 أسابيع',
                 level='مبتدئ',
@@ -324,7 +324,7 @@ def create_tables():
             Course(
                 title='قواعد البيانات المتقدمة', 
                 description='دورة متقدمة في تصميم وإدارة قواعد البيانات',
-                image='https://images.app.goo.gl/i74SP',
+                image='https://ik.imagekit.io/wqgmjzjo5j/ADS.jpg',
                 instructor='د. سارة أحمد',
                 duration='10 أسابيع',
                 level='متقدم',
@@ -333,7 +333,7 @@ def create_tables():
             Course(
                 title='تطوير تطبيقات الويب', 
                 description='تعلم كيفية بناء تطبيقات ويب حديثة باستخدام Flask وDjango',
-                image='https://images.app.goo.gl/Ectia',
+                image='https://ik.imagekit.io/wqgmjzjo5j/WD.jpg',
                 instructor='م. محمد علي',
                 duration='12 أسبوع',
                 level='متوسط',
@@ -342,7 +342,7 @@ def create_tables():
             Course(
                 title='الذكاء الاصطناعي', 
                 description='مقدمة في مفاهيم وتقنيات الذكاء الاصطناعي وتعلم الآلة',
-                image='https://images.app.goo.gl/SqLDg',
+                image='https://ik.imagekit.io/wqgmjzjo5j/AI.jpg',
                 instructor='د. ليلى حسن',
                 duration='14 أسبوع',
                 level='متقدم',
@@ -351,7 +351,7 @@ def create_tables():
             Course(
                 title='أمن المعلومات', 
                 description='دورة شاملة في أساسيات أمن المعلومات وحماية البيانات',
-                image='https://images.app.goo.gl/kz5JA',
+                image='https://ik.imagekit.io/wqgmjzjo5j/IS.jpeg',
                 instructor='د. خالد عمر',
                 duration='8 أسابيع',
                 level='متوسط',
@@ -360,7 +360,7 @@ def create_tables():
             Course(
                 title='تطوير تطبيقات الهاتف المحمول', 
                 description='تعلم كيفية بناء تطبيقات للهواتف الذكية باستخدام React Native وFlutter',
-                image='https://images.app.goo.gl/hZbgA',
+                image='https://ik.imagekit.io/wqgmjzjo5j/MAD.jpeg',
                 instructor='م. نورا سامي',
                 duration='10 أسابيع',
                 level='متوسط',
@@ -369,7 +369,7 @@ def create_tables():
             Course(
                 title='الشبكات وأنظمة التشغيل', 
                 description='دورة شاملة في أساسيات الشبكات وأنظمة التشغيل',
-                image='https://images.app.goo.gl/BN7Mg',
+                image='https://ik.imagekit.io/wqgmjzjo5j/OS.jpg',
                 instructor='د. سمير فؤاد',
                 duration='12 أسبوع',
                 level='مبتدئ',
@@ -378,7 +378,7 @@ def create_tables():
             Course(
                 title='تحليل البيانات وعلم البيانات', 
                 description='تعلم كيفية تحليل البيانات واستخراج الرؤى منها باستخدام Python وR',
-                image='https://images.app.goo.gl/SNvkh',
+                image='https://ik.imagekit.io/wqgmjzjo5j/DS.jpg',
                 instructor='د. هدى كمال',
                 duration='14 أسبوع',
                 level='متوسط',
