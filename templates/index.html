@@ -41,7 +41,7 @@
             {% for course in popular_courses %}
             <div class="col-md-4 mb-4">
                 <div class="card course-card h-100">
-                    <img src="{{ url_for('static', filename='uploads/' + course.image) }}" class="course-image" alt="{{ course.title }}">
+                    <img src="{{ course.image }}" class="course-image" alt="{{ course.title }}">
                     <div class="card-body">
                         <h5 class="course-title">{{ course.title }}</h5>
                         <div class="course-meta">
