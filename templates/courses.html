@@ -1,0 +1,205 @@
+﻿{% extends "layout.html" %}
+
+{% block title %}الدورات المتاحة - بوابة الطلاب{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h1 class="mb-4">الدورات المتاحة</h1>
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0">قائمة الدورات</h3>
+            </div>
+            <div class="card-body">
+                <div id="loading" class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">جاري التحميل...</span>
+                    </div>
+                    <p class="mt-2">جاري تحميل الدورات...</p>
+                </div>
+
+                <div id="coursesList" class="row" style="display: none;">
+                    <!-- سيتم تحميل الدورات هنا باستخدام AJAX -->
+                </div>
+
+                <div id="error-message" class="alert alert-danger" style="display: none;">
+                    حدث خطأ أثناء تحميل الدورات. يرجى المحاولة مرة أخرى.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- قالب لعرض الدورات -->
+<template id="course-template">
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h4 class="course-title"></h4>
+            </div>
+            <div class="card-body">
+                <p class="course-description"></p>
+                <button class="btn btn-primary enroll-button" data-course-id="">
+                    التسجيل في الدورة
+                </button>
+            </div>
+        </div>
+    </div>
+</template>
+
+<!-- نافذة منبثقة للتأكيد -->
+<div class="modal fade" id="enrollmentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">تأكيد التسجيل</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+            </div>
+            <div class="modal-body">
+                <p>هل أنت متأكد من رغبتك في التسجيل في دورة <span id="courseName"></span>؟</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                <button type="button" class="btn btn-primary" id="confirmEnroll">تأكيد التسجيل</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function () {
+        // تحميل الدورات باستخدام AJAX
+        $.get('/api/courses', function (courses) {
+            $('#loading').hide();
+
+            if (courses && courses.length > 0) {
+                const coursesList = $('#coursesList');
+                coursesList.show();
+
+                // إضافة كل دورة إلى القائمة
+                courses.forEach(function (course) {
+                    const template = document.getElementById('course-template');
+                    const clone = document.importNode(template.content, true);
+
+                    // تعيين بيانات الدورة
+                    clone.querySelector('.course-title').textContent = course.title;
+                    clone.querySelector('.course-description').textContent = course.description;
+
+                    const enrollButton = clone.querySelector('.enroll-button');
+                    enrollButton.setAttribute('data-course-id', course.id);
+                    enrollButton.setAttribute('data-course-title', course.title);
+
+                    coursesList.append(clone);
+                });
+
+                // إضافة معالج أحداث لأزرار التسجيل
+                $('.enroll-button').click(function () {
+                    const courseId = $(this).data('course-id');
+                    const courseTitle = $(this).data('course-title');
+
+                    // عرض اسم الدورة في النافذة المنبثقة
+                    $('#courseName').text(courseTitle);
+
+                    // تخزين معرف الدورة للاستخدام عند التأكيد
+                    $('#confirmEnroll').attr('data-course-id', courseId);
+
+                    // عرض النافذة المنبثقة
+                    const modal = new bootstrap.Modal(document.getElementById('enrollmentModal'));
+                    modal.show();
+                });
+
+                // معالج حدث زر التأكيد
+                $('#confirmEnroll').click(function () {
+                    const rawCourseId = $(this).attr('data-course-id');
+
+                    // Check if rawCourseId is a non-empty string and then parse
+                    if (typeof rawCourseId !== 'string' || rawCourseId.trim() === '') {
+                        console.error('Invalid or empty course ID before parseInt:', rawCourseId);
+                        $('#enrollmentModal').modal('hide');
+                        const alertHtml = `
+                            <div class="alert alert-danger alert-dismissible fade show">
+                                معرف الدورة مفقود أو غير صالح. لا يمكن إتمام عملية التسجيل.
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        `;
+                        $('#coursesList').before(alertHtml);
+                        return;
+                    }
+
+                    const courseId = parseInt(rawCourseId, 10);
+
+                    if (isNaN(courseId)) {
+                        console.error('Invalid course ID after parseInt:', rawCourseId);
+                        // إخفاء النافذة المنبثقة
+                        $('#enrollmentModal').modal('hide');
+                        // عرض رسالة خطأ مناسبة للمستخدم
+                        const alertHtml = `
+                            <div class="alert alert-danger alert-dismissible fade show">
+                                معرف الدورة غير صالح. لا يمكن إتمام عملية التسجيل.
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        `;
+                        $('#coursesList').before(alertHtml);
+                        return; // منع إرسال الطلب
+                    }
+
+                    // إرسال طلب التسجيل باستخدام AJAX
+                    $.ajax({
+                        url: '/ajax/enroll',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ course_id: courseId }),
+                        success: function (response) {
+                            // إخفاء النافذة المنبثقة
+                            $('#enrollmentModal').modal('hide');
+
+                            // عرض رسالة نجاح
+                            const alertHtml = `
+                                <div class="alert alert-success alert-dismissible fade show">
+                                    ${response.message}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            `;
+                            $('#coursesList').before(alertHtml);
+
+                            // تعطيل زر التسجيل للدورة التي تم التسجيل فيها
+                            $(`.enroll-button[data-course-id="${courseId}"]`)
+                                .removeClass('btn-primary')
+                                .addClass('btn-success')
+                                .text('تم التسجيل')
+                                .prop('disabled', true);
+                        },
+                        error: function (xhr) {
+                            // إخفاء النافذة المنبثقة
+                            $('#enrollmentModal').modal('hide');
+
+                            // عرض رسالة خطأ
+                            let errorMessage = 'حدث خطأ أثناء التسجيل في الدورة';
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                errorMessage = xhr.responseJSON.message;
+                            }
+
+                            const alertHtml = `
+                                <div class="alert alert-danger alert-dismissible fade show">
+                                    ${errorMessage}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            `;
+                            $('#coursesList').before(alertHtml);
+                        }
+                    });
+                });
+            } else {
+                // عرض رسالة في حالة عدم وجود دورات
+                $('#coursesList').html('<div class="col-12"><div class="alert alert-info">لا توجد دورات متاحة حالياً</div></div>').show();
+            }
+        }).fail(function () {
+            // عرض رسالة خطأ في حالة فشل الطلب
+            $('#loading').hide();
+            $('#error-message').show();
+        });
+    });
+</script>
+{% endblock %}
